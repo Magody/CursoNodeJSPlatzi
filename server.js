@@ -1,7 +1,11 @@
 const express = require('express');  //librería express
 const bodyParser = require("body-parser")
+
+const db = require('./db')
+
 const router = require('./modulo_network/routes')//require('./components/message/network')  //recolecta con export
 
+db('mongodb://localhost:27017/telegram')
 
 var app = express();
 app.use(bodyParser.json());  //define el tipo de datos a enviar
@@ -13,7 +17,7 @@ router(app)
 app.use("/app", express.static('public'));
 
 
-app.listen(3000);
+app.listen(3001);
 
 console.log("La aplicación está escuchando en http://localhost:3000");
 

@@ -6,15 +6,9 @@
 //mongodb://user:user1234@localhost:5510/telegram
 //'mongodb://localhost:27017/myapp' -> local
 
-const db = require('mongoose')
 const Model = require('./model')
 
-db.Promise = global.Promise  // scoope Global (javascript -nodejs), cuando quieras utilizar cualquier promesa usa esta eso nos dice
-db.connect('mongodb://localhost:27017/telegram', {
-    useNewUrlParser: true, //evita problemas de compatibilidad
-})
 
-console.log("DB conectada con éxito")
 
 function addMessage(message){
     // list.push(message)
@@ -23,17 +17,57 @@ function addMessage(message){
 
 }
 
-async function getMessage(){
+function getMessage(chat){
     //return list
-    const messages = await Model.find()
-    return messages
 
+    return new Promise((resolve, reject) =>{
+        let filter = {}
+
+        if(chat != null){
+            filter = {chat: chat}
+        }
+        
+        Model.find(filter)
+            .populate('user')  //busca los object id y los carga
+            .exec((error, populatedData) => {
+
+                if(error){
+                    reject(error)
+                    return false
+                }
+
+                resolve(populatedData)
+            })
+            
+    })
+
+   
+
+}
+
+async function updateText(id, message){
+    const foundMessage = await Model.findOne({
+        "_id": id //se puede investigar dentro de mongoDB
+    })
+
+    console.log("\n")
+    console.log(foundMessage)
+    foundMessage.message = message // Podemos usar el update de mongo?
+    const newMessage = await foundMessage.save()
+    return newMessage
+}
+
+
+function deleteMessage(id){
+    return Model.deleteOne({"_id":id})
 }
 
 //exporta funciones
 module.exports = {
     add: addMessage,
-    list: getMessage
+    list: getMessage,
+    updateText: updateText,
+    remove: deleteMessage
     //get
     //update
     //delete

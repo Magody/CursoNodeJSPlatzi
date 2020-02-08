@@ -1,0 +1,20 @@
+from socket import *
+
+
+clientSocket = None
+try:
+	serverName = "192.168.137.1"
+	serverPort = 12000
+	clientSocket = socket(AF_INET, SOCK_STREAM)
+	clientSocket.connect((serverName,serverPort))
+	sentence = input("Input lowercase sentence:")
+
+	clientSocket.send(bytes(sentence, 'utf8'))
+	modifiedSentence = clientSocket.recv(2048)
+	print("From Server:", modifiedSentence)
+except:
+	print("Error")
+finally:
+	if clientSocket != None:
+		clientSocket.close()
+		print("Cerrando el socket")
