@@ -2,6 +2,10 @@
 
 const store = require('./store')
 
+const socket = require("../../socket").socket  //evita traer el connect
+
+const config = require("../../config")
+
 function addMessage(chat, user, message, file){
     //
     return new Promise((resolve, reject) =>{
@@ -13,7 +17,7 @@ function addMessage(chat, user, message, file){
 
         let fileUrl = ''
         if(file){
-            fileUrl = 'http://localhost:3001/app/files/'+file.filename
+            fileUrl = config.host+':'+ config.port + config.publicRoute + config.files + '/'+file.filename
         }
         //para poder descargar el archivo
 
@@ -29,6 +33,11 @@ function addMessage(chat, user, message, file){
     
         //console.log(fullMessage)
         store.add(fullMessage)
+
+
+        socket.io.emit("mensaje", fullMessage)
+
+
         resolve(fullMessage)
     })
 
